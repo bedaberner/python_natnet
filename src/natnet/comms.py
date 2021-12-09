@@ -15,7 +15,7 @@ import collections
 import select
 import socket
 import struct
-import timeit
+import time
 
 import attr
 
@@ -123,7 +123,7 @@ class Connection(object):
         if len(readable) > 0:
             # Just get the first message this time around
             data, self.last_sender_address = readable[0].recvfrom(32768)  # type: bytes
-            received_time = timeit.default_timer()  # type: float
+            received_time = time.time()  # type: float
 
         return data, received_time
 
@@ -207,10 +207,10 @@ class ClockSynchronizer(object):
 
     def server_time_now(self):
         """Get the current time on the server's HPC."""
-        return self.local_to_server_time(timeit.default_timer())
+        return self.local_to_server_time(time.time())
 
     def send_echo_request(self, conn):
-        self._last_sent_time = timeit.default_timer()
+        self._last_sent_time = time.time()
         sent_timestamp_int = int(self._last_sent_time*1e9)
         conn.send_message(protocol.EchoRequestMessage(sent_timestamp_int))
 
@@ -265,7 +265,7 @@ class ClockSynchronizer(object):
         self._echo_count += 1
 
     def update(self, conn):
-        now = timeit.default_timer()
+        now = time.time()
         time_since_last_echo = now - self._last_sent_time
         time_since_last_sync = now - self._last_synced_at
 
@@ -308,7 +308,7 @@ class TimestampAndLatency(object):
         system_latency_ticks = timing_info.transmit_timestamp - timing_info.camera_mid_exposure_timestamp
         system_latency = clock.server_ticks_to_seconds(system_latency_ticks)
         transit_latency = received_timestamp - clock.server_to_local_time(timing_info.transmit_timestamp)
-        processing_latency = timeit.default_timer() - received_timestamp
+        processing_latency = time.time() - received_timestamp
         return cls(timestamp, system_latency, transit_latency, processing_latency)
 
     @property
