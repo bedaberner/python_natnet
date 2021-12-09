@@ -12,7 +12,6 @@ __all__ = ['SingleFrameFakeClient']
 
 import os.path
 import time
-import timeit
 
 from .comms import Client, ClockSynchronizer, Connection
 from .logging import Logger
@@ -68,9 +67,9 @@ class FakeConnection(Connection):
             if message_id == MessageId.FrameOfData:
                 if self.last_frame_time:
                     next_frame_due = self.last_frame_time + 1.0/self.rate
-                    sleep_time = next_frame_due - timeit.default_timer()
+                    sleep_time = next_frame_due - time.time()
                     time.sleep(max(sleep_time, 0))
-                self.last_frame_time = timeit.default_timer()
+                self.last_frame_time = time.time()
             received_time = self.last_frame_time
 
         return packet, received_time
@@ -91,7 +90,7 @@ class FakeClockSynchronizer(ClockSynchronizer):
         pass
 
     def server_to_local_time(self, server_ticks):
-        return timeit.default_timer()
+        return time.time()
 
     def initial_sync(self, *args, **kwargs):
         pass

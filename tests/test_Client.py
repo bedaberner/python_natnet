@@ -65,7 +65,7 @@ def test_client_calls_callback_for_mocapframe(client_with_fakes, test_packets, t
     # Fake current time to be the time the server sent the message
     received_time = client._clock_synchronizer.server_ticks_to_seconds(
             mocapframe_message.timing_info.transmit_timestamp)
-    with mock.patch('natnet.comms.timeit.default_timer', lambda: received_time):
+    with mock.patch('natnet.comms.time.time', lambda: received_time):
         # Set wait_for_message to return a FrameOfData the first time, then raise SystemExit the
         # second time
         client._conn.add_packet(mocapframe_packet)

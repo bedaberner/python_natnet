@@ -13,7 +13,7 @@ from __future__ import division, print_function
 import select
 import socket
 import struct
-import timeit
+import time
 
 import attr
 
@@ -74,7 +74,7 @@ class ServerConnection(object):
         if len(readable) > 0:
             # Just get the first message this time around
             data, client_address = readable[0].recvfrom(32768)  # type: bytes
-            received_time = timeit.default_timer()  # type: float
+            received_time = time.time()  # type: float
         return data, client_address, received_time
 
     def wait_for_message(self, timeout=None):
@@ -122,7 +122,7 @@ class Server(object):
         self._conn.send_message(msg, client_address)
 
     def _send_frame(self):
-        now = timeit.default_timer()
+        now = time.time()
         now_int = int(now*1e9)
         timing_info = TimingInfo(
             timecode=0,
@@ -164,7 +164,7 @@ class Server(object):
         while not self.should_exit:
             if self._last_frame_time:
                 next_frame_due = self._last_frame_time + 1.0/rate
-                sleep_time = max(0, next_frame_due - timeit.default_timer())
+                sleep_time = max(0, next_frame_due - time.time())
                 message, client_address, received_time = self._conn.wait_for_message(timeout=sleep_time)
                 if message is not None:
                     if type(message) is EchoRequestMessage:

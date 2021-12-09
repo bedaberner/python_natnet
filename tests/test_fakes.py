@@ -1,6 +1,6 @@
 """Tests for fakes."""
 
-import timeit
+import time
 
 import mock
 import pytest
@@ -61,7 +61,7 @@ def test_single_frame_fake_client_with_rate():
     client = SingleFrameFakeClient.fake_connect(rate=rate)
 
     times = []
-    client.set_callback(lambda r, s, t: times.append(timeit.default_timer()))
+    client.set_callback(lambda r, s, t: times.append(time.time()))
     for i in range(10):
         client.run_once()
 
@@ -75,7 +75,7 @@ def test_single_frame_fake_client_timestamps():
     client = SingleFrameFakeClient.fake_connect(rate=rate)
 
     def check_time(r, s, t):
-        assert t.timestamp == pytest.approx(timeit.default_timer(), abs=1e3)
+        assert t.timestamp == pytest.approx(time.time(), abs=1e3)
         assert t.transit_latency == pytest.approx(0, abs=1e3)
 
     client.set_callback(check_time)
